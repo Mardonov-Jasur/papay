@@ -2,24 +2,41 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 const http = require ('http');
-const mongodb = require ("mongodb")
+const mongoose = require ("mongoose")
 
 const connectionString = process.env.MONGO_URL;
-mongodb.connect(connectionString, {
+
+
+mongoose
+ .connect(connectionString, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
-}, (err, client) => {
-    if(err) console.log("ERROR on connection MongoDB");
-    else {
-        console.log("MongoDB connection succed");
-        module.exports = client;
+})
+.then(() => {
+    console.log ("Mongoose Connected Successfully");
         const app = require("./app")
         const server = http.createServer(app);
         let PORT = process.env.PORT || 5001;
         server.listen(PORT, function () {
          console.log(`The server is running succesful om PORT ${PORT}, http://localhost:${PORT}`);
-    })  
-    }
+    });
+})
+.catch((err) => {
+    console.log("ERROR on connection MongoDB");
 });
-
-//Jasur
+// mongoose.connect(connectionString, {
+//     useNewUrlParser: true,
+//     useUnifiedTopology: true,
+// }, (err, goose) => {
+//     if(err) console.log("ERROR on connection MongoDB");
+//     else {
+//         console.log("MongoDB connection succed");
+//         console.log(mongoose);
+//         const app = require("./app")
+//         const server = http.createServer(app);
+//         let PORT = process.env.PORT || 5001;
+//         server.listen(PORT, function () {
+//          console.log(`The server is running succesful om PORT ${PORT}, http://localhost:${PORT}`);
+//     })  
+//     }
+// });
