@@ -1,5 +1,47 @@
+const MemeberModel = require("../schema/member.model");
+const Definer = require("../lib/mistake");
+const assert = require ("assert");
+
 class Member {
-    constructor() {}
+    constructor() {
+        this.memberModel = MemeberModel;
+    }
+
+    async signupDate(input)  {
+        try {
+            const new_member = new this.memberModel(input);
+
+            let result;
+            try {
+               result = await new_member.save(); 
+            } catch (mongo_err) {
+                console.log(mongo_err);
+                throw new Error(Definer.auth_err1);
+            }
+
+            result.mb_password = "";
+            return result;
+        } catch (err) {
+            throw err;
+        }
+    }
+
+
+async loginDate(input)  {
+    try {
+        const member = await this.memberModel
+          .findOne(
+            {mb_nick: input.mb_nick}, {mb_nick: 1, mb_password: 1})
+          .exec();
+
+          assert.ok(member, Definer.err_auth3);
+          console.log(member);
+
+        console.log ("member:::", member);
+    } catch (err) {
+        throw err;
+    }
+ }
 }
 
 module.exports = Member;
