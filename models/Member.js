@@ -27,21 +27,28 @@ class Member {
     }
 
 
-async loginDate(input)  {
-    try {
-        const member = await this.memberModel
-          .findOne(
-            {mb_nick: input.mb_nick}, {mb_nick: 1, mb_password: 1})
-          .exec();
+ async loginDate(input)  {
+     try {
+            const member = await this.memberModel
+            .findOne(
+                {mb_nick: input.mb_nick}, {mb_nick: 1, mb_password: 1})
+            .exec();
 
-          assert.ok(member, Definer.err_auth3);
-          console.log(member);
+            assert.ok(member, Definer.auth_err3);
+            console.log(member);
 
-        console.log ("member:::", member);
-    } catch (err) {
-        throw err;
-    }
- }
+            const isMatch = input.mb_password === member.mb_password;
+            assert.ok(isMatch, Definer.auth_err4);
+
+            return await this.memberModel 
+            .findOne ({
+                mb_nick: input.mb_nick,
+            })
+            .exec();
+        } catch (err) {
+            throw err;
+        }
+   }
 }
 
 module.exports = Member;
