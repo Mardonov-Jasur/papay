@@ -50,7 +50,7 @@ class Member {
             .findOne ({
                 mb_nick: input.mb_nick,
             })
-            .exec();
+            // .exec();
         } catch (err) {
             throw err;
         }
