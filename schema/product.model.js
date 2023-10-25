@@ -3,7 +3,7 @@ const {
     product_collection_enums,
     product_status_enums,
     product_size_enums,
-    product_volue_enums
+    product_volume_enums
 } = require("../lib/config");
 const Schema = mongoose.Schema;
 
@@ -55,19 +55,19 @@ const productSchema = new mongoose.Schema({
             message: "{VALUE} is not among permitted enum values}",
         } 
     },
-    product_volue: {
+    product_volume: {
         type: String,
         default: 1,
         required: function() {
             return (this.product_collection === "drink")
         },
         enum: {
-            values: product_volue_enums,
+            values: product_volume_enums,
             message: "{VALUE} is not among permitted enum values}",
         } 
     },
     product_description: {
-        type: Number,
+        type: String,
         required: true
     },
     product_images: {
@@ -85,7 +85,7 @@ const productSchema = new mongoose.Schema({
         required: false,
         default: 0
     },
-    product_mb_id: {
+    restaurant_mb_id: {
         type: Schema.Types.ObjectId,
         required: false,
         ref: "Member"
@@ -93,7 +93,7 @@ const productSchema = new mongoose.Schema({
 }, {timestamps: true}); //createdAt, updateAt
 
 productSchema.index(
-    {restaurant_mb_id: 1, product_name: 1, product_size: 1, product_volue: 1},
+    {restaurant_mb_id: 1, product_name: 1, product_size: 1, product_volume: 1},
     {unique: true}
 );
 
