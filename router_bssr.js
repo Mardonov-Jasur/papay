@@ -19,7 +19,7 @@ router_bssr.get ("/check-me", restaurantController.checkSessions);
 
 
 router_bssr
-    .get ("/products/menu", restaurantController.getMyRestaurantData)
+    .get ("/products/menu", restaurantController.getMyRestaurantProducts)
     .post (
         "/products/create",
         restaurantController.validateAuthRestaurant,
