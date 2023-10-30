@@ -15,13 +15,13 @@ mongoose.connect(
 }, (err, goose) => {
     if(err) console.log("ERROR on connection MongoDB");
     else {
-        console.log("MongoDB connection succed");
+        console.log("MongoDB connection succeed");
         // console.log(goose);
         const app = require("./app")
         const server = http.createServer(app);
         let PORT = process.env.PORT || 5001;
         server.listen(PORT, function () {
-         console.log(`The server is running succesful om PORT ${PORT}, http://localhost:${PORT}`);
+         console.log(`The server is running succesfully on PORT ${PORT}, http://localhost:${PORT}`);
     })  
     }
 });
