@@ -83,12 +83,11 @@
                         value="Rasmni tanlang"
                         disabled="disabled"
                         >
-                        <label>Rasm Yuklash</label>
+                        <label for="input_file">Rasm Yuklash</label>
                         <input
                             type="file"
                             id="input_file"
                             name="restaurant_img"
-                            placeholder="passwordni tasdiqlash"
                             class="upload-hidden form-control-file restaurant_img"
                         />
                     </div>
@@ -108,11 +107,40 @@
 </body>
 
 <script>
+    $(function () {
+        let fileTarget = $(".filebox .upload-hidden");
+        let filename = "";
+        fileTarget.on("change", function() {
+            if (window.FileReader) {
+                const uploading_file = $(this)[0].files[0];
+                const fileType = uploading_file["type"];
+                const validImagesTypes = ["image/jpg", "image/jpeg", "image/png",]
+                if (!validImagesTypes.includes(fileType)) {
+                    alert(
+                        "Iltimos ruxsat etilgan formatdagi rasmlarni yuklang: jpg, jprg, png"
+                    );
+                } else {
+                    if (uploading_file) {
+                        console.log(URL.createObjectURL(uploading_file));
+                        $(".upload_img_frame")
+                          .attr("src", URL.createObjectURL(uploading_file))
+                          .addClass("succcess");
+                    }
+                    filename = uploading_file.name;
+                }
+            }
+
+            $(this).siblings('.upload-name').val(filename);
+        });
+    });
+
+
     function validateSignUpForm() {
         const mb_nick = $(".mb_nick").val();
         const mb_phone = $(".mb_phone").val();
         const mb_password = $(".mb_password").val();
         const mb_confirm_password = $(".mb_confirm_password").val();
+        const restaurant_img = $('.restaurant_img').get(0).files[0] ?? null;
 
         if (
             mb_nick == "" ||
@@ -121,12 +149,18 @@
             mb_confirm_password == ""
         ) {
             alert("Iltimos barcha ma'lumotlarni kiriting!");
+            return false;
         } else if (mb_password !== mb_confirm_password) {
-            alert(`Iltimos passwordni to'g'ri kiriting`);
+            alert(`Iltimos passwordni to'g'ri kiriting!`);
+            return false;
+        }
+
+        if (!restaurant_img) {
+            alert("Iltimos rasmni yuklang!");
         }
         
 
-        return false;
+        return true;
     }
 </script>
 
