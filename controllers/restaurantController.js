@@ -122,3 +122,28 @@ restaurantController.checkSessions = (req, res) => {
         res.json({state: "fail", message: "You are not authenticated"}); 
     }
 };
+
+restaurantController.validateAdmin = (req, res, next) => {
+    if (req.session.member.mb_type === "ADMIN") {
+        req.member = req.session.member;
+        next();
+    } else {
+        const html = `<script>
+              alert('Admin page: Permission denied!');
+              </script>`;
+        res.end(html);
+    }
+};
+
+restaurantController.getAllRestaurants = (req, res) => {
+    try {
+        console.log("GET cont/getAllRestaurants");
+
+        //todo: hamma restaurantlarni dbdan chaqirish
+        res.render("all-restaurants");
+
+    } catch(err) {
+        console.log (`ERROR, cont/getAllRestaurants, ${err.message}`);
+        res.json({state: "fail", message: err.message});
+    }
+}
