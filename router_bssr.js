@@ -37,13 +37,20 @@ router_bssr
         "/products/edit/:id",
         restaurantController.validateAuthRestaurant,
         productController.updateChosenProduct
-    );
-
-    router_bssr.get(
+    )
+    .get(
         "/all-restaurant",
         restaurantController.validateAdmin,
         restaurantController.getAllRestaurants
+    )
+    .post(
+        "/all-restaurant/edit",
+        restaurantController.validateAdmin,
+        restaurantController.updateRestaurantByAdmin
     );
+
+    
+    
 
 
 
