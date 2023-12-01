@@ -12,11 +12,11 @@ memberController.signup = async (req, res) => {
       member = new Member(),
       new_member = await member.signupDate(data);
 
-     const token = memberController.createToken(new_member);
-     res.cookie("access_token", token, {
-       maxAge: 6 * 3600 * 1000,
-       httpOnly: true
-     });
+    const token = memberController.createToken(new_member);
+    res.cookie("access_token", token, {
+      maxAge: 6 * 3600 * 1000,
+      httpOnly: true
+    });
 
     res.json({ state: "succed", data: new_member });
   } catch (err) {
@@ -47,7 +47,7 @@ memberController.login = async (req, res) => {
 };
 
 memberController.logout = (req, res) => {
-  console.log("GET cont.logout");
+  console.log("GET cont/logout");
   res.send("Siz logout sahifasidasiz");
 };
 
@@ -65,6 +65,21 @@ memberController.createToken = (result) => {
 
     assert.ok(token, Definer.auth_err2);
     return token;
+  } catch (err) {
+    throw err;
+  }
+};
+
+memberController.checkMyAuthentication = (req, res) => {
+  try {
+    console.log("GET cont/checkMyAuthentication");
+    let token = req.cookies["access_token"];
+    console.log("token;;;;", token);
+
+    const member = token ? jwt.verify(token, process.env.SECRET_TOKEN) : null;
+    assert.ok(member, Definer.auth_err2);
+
+    res.json({ state: "succed", data: member });
   } catch (err) {
     throw err;
   }
