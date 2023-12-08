@@ -1,10 +1,10 @@
 const assert = require("assert");
 const Order = require("../models/Order");
 
-let OrderController = module.exports;
+let orderController = module.exports;
 const Definer = require("../lib/mistake");
 
-OrderController.createOrder = async (req, res) => {
+orderController.createOrder = async (req, res) => {
   try {
     console.log("POST: cont/createOrder");
     assert.ok(req.member, Definer.auth_err5);
