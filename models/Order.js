@@ -137,7 +137,7 @@ class Order {
       const result = await this.orderModel.findByIdAndUpdate(
         { mb_id: mb_id, _id: order_id },
         { order_status: order_status },
-        { runValidators: true, lean: true, returnDocument: "after" }
+        {returnDocument: "after" }
       );
       console.log(result);
 
