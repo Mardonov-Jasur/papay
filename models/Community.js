@@ -7,6 +7,7 @@ const {
   board_id_enum_list
 } = require("../lib/config");
 const View = require("./view");
+const Member = require ("./Member");
 
 class Community {
   constructor() {
@@ -79,24 +80,42 @@ class Community {
         ? { [`${inquery.order}`]: -1 }
         : { createdAt: -1 };
 
-         const result = await this.boArticleModel
-           .aggregate([
-             { $match: matches },
-             { $sort: sort },
-             { $skip: (inquery.page - 1) * inquery.limit },
-             { $limit: inquery.limit },
-             {
-               $lookup: {
-                 from: "members",
-                 localField: "mb_id",
-                 foreignField: "_id",
-                 as: "member_data"
-               }
-             },
-             { $unwind: "$member_data" }
-             //TODO: check auth member liked the chosen target
-           ])
-           .exec();
+      const result = await this.boArticleModel
+        .aggregate([
+          { $match: matches },
+          { $sort: sort },
+          { $skip: (inquery.page - 1) * inquery.limit },
+          { $limit: inquery.limit },
+          {
+            $lookup: {
+              from: "members",
+              localField: "mb_id",
+              foreignField: "_id",
+              as: "member_data"
+            }
+          },
+          { $unwind: "$member_data" }
+          //TODO: check auth member liked the chosen target
+        ])
+        .exec();
+      assert.ok(result, Definer.article_err2);
+
+      return result;
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async getChosenArticleData(member, art_id) {
+    try {
+      art_id = shapeIntoMongooseObjectId(art_id);
+
+      //increase art_views when usen has not seen before
+      if(member) {
+        const member_obj = new Member();
+        await member_obj.viewChosenItemByMember(member, art_id, "community");
+      }
+      const result = await this.boArticleModel.findById({ _id: art_id}).exec();
       assert.ok(result, Definer.article_err2);
 
       return result;
