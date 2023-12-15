@@ -43,7 +43,7 @@ class Follow {
     try {
       const new_follow = new this.followModel({
         follow_id: follow_id,
-        subscribe_id: subscriber_id
+        subscriber_id: subscriber_id
       });
       return await new_follow.save();
     } catch (mongo_err) {
@@ -82,14 +82,54 @@ class Follow {
 
       const result = await this.followModel.findOneAndDelete({
         follow_id: follow_id,
-        subscriber_id: subscriber_id,
+        subscriber_id: subscriber_id
       });
-       assert.ok(result, Definer.generel_err1);
+      assert.ok(result, Definer.generel_err1);
 
-       await this.modifyMemberFollowCounts(follow_id, 'subscriber_change', -1);
-       await this.modifyMemberFollowCounts( subscriber_id, "follow_change", -1);
+      await this.modifyMemberFollowCounts(follow_id, "subscriber_change", -1);
+      await this.modifyMemberFollowCounts(subscriber_id, "follow_change", -1);
 
       return true;
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async getMemberFollowingsData(inquiry) {
+    try {
+      console.log("query::::", inquiry);
+      const subscriber_id = shapeIntoMongooseObjectId(inquiry.mb_id),
+        page = inquiry.page * 1,
+        limit = inquiry.limit * 1;
+      console.log("subs-id::::", subscriber_id);
+
+      const result = await this.followModel
+        .aggregate([
+          { $match: { subscriber_id: subscriber_id } },
+          { $sort: { createdAt: -1 } },
+          { $skip: (page - 1) * limit },
+          { $limit: limit },
+          {
+            $lookup: {
+              from: "members",
+              localField: "follow_id",
+              foreignField: "_id",
+              as: "follow_member_data"
+            }
+          },
+          { $unwind: "$follow_member_data" }
+        ])
+        .exec();
+      // if (result.length === 0) {
+      //   // Handle empty result gracefully, e.g., return a specific response or throw a custom error
+      //   console.log("No matching data found.");
+      //   return []; // Or handle as needed
+      // }
+      /**Ozi resultni ichida hich nima kelmayotgandi { $match: { subscriber_id: subscriber_id } } shu qismini comentga olib qoygandim ishladi. Chat gptdan soraganimda mana bu ifni kiritb kor dedi va shuni ishlatdim ishlasb ketdi */
+
+      console.log("result::::", result);
+      assert.ok(result, Definer.follow_err3);
+      return result;
     } catch (err) {
       throw err;
     }
