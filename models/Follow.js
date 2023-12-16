@@ -1,7 +1,8 @@
 const assert = require("assert");
 const {
   shapeIntoMongooseObjectId,
-  product_collection_enums
+  product_collection_enums,
+  lookup_auth_member_following
 } = require("../lib/config");
 const Definer = require("../lib/mistake");
 const FollowModel = require("../schema/follow.model");
@@ -125,10 +126,48 @@ class Follow {
       //   console.log("No matching data found.");
       //   return []; // Or handle as needed
       // }
-      /**Ozi resultni ichida hich nima kelmayotgandi { $match: { subscriber_id: subscriber_id } } shu qismini comentga olib qoygandim ishladi. Chat gptdan soraganimda mana bu ifni kiritb kor dedi va shuni ishlatdim ishlasb ketdi */
+      /**Ozi resultni ichida hich nima kelmayotgandi { $match: { subscriber_id: subscriber_id } } shu qismini comentga olib qoygandim ishladi. Chat gptdan soraganimda mana bu ifni kiritb kor dedi va shuni ishlatdim ishlasb ketdi. Bohqa sababi MOngo dbda bolishiyam mumkin. OLdin subscribe_id deb hato yozib qoyib keyin togirlagan edim */
 
       console.log("result::::", result);
       assert.ok(result, Definer.follow_err3);
+      return result;
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async getMemberFollowersData(member, inquiry) {
+    try {
+      const follow_id = shapeIntoMongooseObjectId(inquiry.mb_id),
+        page = inquiry.page * 1,
+        limit = inquiry.limit * 1;
+          console.log("follow_id", follow_id);
+          console.log("inqiry", inquiry.mb_id);
+
+      let aggregateQuery = [
+        { $match: { follow_id: follow_id } },
+        { $sort: { createdAt: -1 } },
+        { $skip: (page - 1) * limit },
+        { $limit: limit },
+        {
+          $lookup: {
+            from: "members",
+            localField: "subscriber_id",
+            foreignField: "_id",
+            as: "subscriber_member_data"
+          }
+        },
+        { $unwind: "$subscriber_member_data" }
+      ];
+      console.log(aggregateQuery);
+
+      //following followed back to subscriber
+      if(member && member._id === inquiry.mb_id) {
+        aggregateQuery.push(lookup_auth_member_following(follow_id));
+      }
+
+      const result = await this.followModel.aggregate(aggregateQuery).exec();
+      assert.ok(result, Definer.follow_err1);
       return result;
     } catch (err) {
       throw err;
