@@ -16,13 +16,14 @@ class Follow {
 
   async subscribeData(member, data) {
     try {
-      assert.ok(member._id !== data.mb_id, Definer.follow_err1);
+      assert.ok(member._id !== data.mb_id, Definer.follow_err1); //oziga oziga bolishni taqiqlaydi
 
       const subscriber_id = shapeIntoMongooseObjectId(member._id);
       const follow_id = shapeIntoMongooseObjectId(data.mb_id);
+      console.log("subscriber_id:::::", subscriber_id);
 
       const member_data = await this.memberModel
-        .findById({ _id: follow_id })
+        .findById({ _id: follow_id }) //bu usulda man faqat logout bomagan userlargagina follow bola olaman xolos
         .exec();
       assert.ok(member_data, Definer.generel_err2);
 
@@ -70,7 +71,6 @@ class Follow {
           )
           .exec();
       }
-      return true;
     } catch (err) {
       throw err;
     }
@@ -126,7 +126,7 @@ class Follow {
       //   console.log("No matching data found.");
       //   return []; // Or handle as needed
       // }
-      /**Ozi resultni ichida hich nima kelmayotgandi { $match: { subscriber_id: subscriber_id } } shu qismini comentga olib qoygandim ishladi. Chat gptdan soraganimda mana bu ifni kiritb kor dedi va shuni ishlatdim ishlasb ketdi. Bohqa sababi MOngo dbda bolishiyam mumkin. OLdin subscribe_id deb hato yozib qoyib keyin togirlagan edim */
+      /**Ozi resultni ichida hich nima kelmayotgandi { $match: { subscriber_id: subscriber_id } } shu qismini comentga olib qoygandim ishladi. Chat gptdan soraganimda mana bu ifni kiritb kor dedi va shuni ishlatdim ishlasb ketdi. Bohqa sababi MOngo dbda bolishiyam mumkin. OLdin subscriber_id deb hato yozib qoyib keyin togirlagan edim */
 
       console.log("result::::", result);
       assert.ok(result, Definer.follow_err3);
@@ -141,8 +141,8 @@ class Follow {
       const follow_id = shapeIntoMongooseObjectId(inquiry.mb_id),
         page = inquiry.page * 1,
         limit = inquiry.limit * 1;
-          console.log("follow_id", follow_id);
-          console.log("inqiry", inquiry.mb_id);
+      console.log("follow_id", follow_id);
+      console.log("inqiry", inquiry.mb_id);
 
       let aggregateQuery = [
         { $match: { follow_id: follow_id } },
@@ -162,8 +162,8 @@ class Follow {
       console.log(aggregateQuery);
 
       //following followed back to subscriber
-      if(member && member._id === inquiry.mb_id) {
-        aggregateQuery.push(lookup_auth_member_following(follow_id));
+      if (member && member._id === inquiry.mb_id) {
+        aggregateQuery.push(lookup_auth_member_following(follow_id, 'follows'));
       }
 
       const result = await this.followModel.aggregate(aggregateQuery).exec();
