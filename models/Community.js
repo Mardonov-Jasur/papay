@@ -4,7 +4,8 @@ const assert = require("assert");
 const bcrypt = require("bcryptjs");
 const {
   shapeIntoMongooseObjectId,
-  board_id_enum_list
+  board_id_enum_list,
+  lookup_auth_member_liked
 } = require("../lib/config");
 const View = require("./view");
 const Member = require("./Member");
@@ -94,8 +95,8 @@ class Community {
               as: "member_data"
             }
           },
-          { $unwind: "$member_data" }
-          //TODO: check auth member liked the chosen target
+          { $unwind: "$member_data" },
+          lookup_auth_member_liked(auth_mb_id),
         ])
         .exec();
       assert.ok(result, Definer.article_err2);

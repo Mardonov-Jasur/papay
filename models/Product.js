@@ -1,7 +1,8 @@
 const assert = require("assert");
 const {
   shapeIntoMongooseObjectId,
-  product_collection_enums
+  product_collection_enums,
+  lookup_auth_member_liked
 } = require("../lib/config");
 const Definer = require("../lib/mistake");
 const ProductModel = require("../schema/product.model");
@@ -35,7 +36,7 @@ class Product {
           { $sort: sort },
           { $skip: (data.page * 1 - 1) * data.limit },
           { $limit: data.limit * 1 },
-          //todo: check auth member product likes
+          lookup_auth_member_liked(auth_mb_id),
         ])
         .exec();
         
@@ -57,11 +58,11 @@ class Product {
       }
 
       const result = await this.productModel
-        .aggregate ([
-         { $match: {_id: id, product_status: "PROCESS" } },
-         //todo: check auth member product likes
-      ])
-      .exec();
+        .aggregate([
+          { $match: { _id: id, product_status: "PROCESS" } },
+          lookup_auth_member_liked(auth_mb_id),
+        ])
+        .exec();
 
       assert.ok(result, Definer.generel_err1);
       return result;
