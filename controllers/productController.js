@@ -21,7 +21,7 @@ productController.getChosenProduct = async (req, res) => {
     console.log("GET: cont/getChosenProduct");
     const product = new Product();
     const id = req.params.id;
-    const  result = await product.getChosenProductData(req.member, id);
+    const result = await product.getChosenProductData(req.member, id);
 
     res.json({ state: "success", data: result });
   } catch (err) {
@@ -45,7 +45,7 @@ productController.addNewProduct = async (req, res) => {
     let data = req.body;
 
     data.product_images = req.files.map((ele) => {
-      return ele.path;
+      return ele.path.replace(/\\/g, "/");
     });
 
     const result = await product.addNewProductData(data, req.member);

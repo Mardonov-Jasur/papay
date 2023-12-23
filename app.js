@@ -1,41 +1,42 @@
-console.log ('web serverni boshlash');
-const express = require ("express");
+console.log("web serverni boshlash");
+const express = require("express");
 const app = express();
-const router = require ("./router");
-const router_bssr = require ("./router_bssr");
+const router = require("./router");
+const router_bssr = require("./router_bssr");
+const cors = require("cors");
 const cookieParser = require("cookie-parser");
 
 let session = require("express-session");
 const MongoDBStore = require("connect-mongodb-session")(session);
 const store = new MongoDBStore({
-    uri: process.env.MONGO_URL,
-    collection: "sessions",
+  uri: process.env.MONGO_URL,
+  collection: "sessions"
 });
-
 
 // 1 Kirish code
 app.use(express.static("public"));
+app.use("/uploads", express.static(__dirname + "/uploads"));
 app.use(express.json());
-app.use(express.urlencoded({extended: true}));
+app.use(express.urlencoded({ extended: true }));
+app.use(cors({ credentials: true, origin: true }));
 app.use(cookieParser());
-
 
 // 2: Session code
 app.use(
-    session({
-        secret: process.env.SESSION_SECRET,
-        cookie: {
-            maxAge: 1000 * 60 * 55, //for 55 minutes
-        },
-        store: store,
-        resave: true,
-        saveUninitialized: true,
-    })
+  session({
+    secret: process.env.SESSION_SECRET,
+    cookie: {
+      maxAge: 1000 * 60 * 55 //for 55 minutes
+    },
+    store: store,
+    resave: true,
+    saveUninitialized: true
+  })
 );
-app.use(function(req, res, next) {
-    res.locals.member = req.session.member;
-    next();
-})
+app.use(function (req, res, next) {
+  res.locals.member = req.session.member;
+  next();
+});
 
 // 3 Views code
 app.set("views", "views");
@@ -46,4 +47,3 @@ app.use("/resto", router_bssr);
 app.use("/", router);
 
 module.exports = app;
-
