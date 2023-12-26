@@ -53,7 +53,6 @@ const memberSchema = new mongoose.Schema(
     mb_image: {
       type: String,
       required: false,
-      default: ""
     },
     mb_point: {
       type: Number,
