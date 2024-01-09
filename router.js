@@ -75,6 +75,7 @@ router.post(
 //Community related routers
 router.post(
   "/community/image",
+  memberController.retrieveAuthMember,
   uploader_community.single("community_image"),
   communityController.imageInsertion
 );
