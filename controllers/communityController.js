@@ -6,7 +6,6 @@ const Community = require("../models/Community");
 communityController.imageInsertion = async (req, res) => {
   try {
     console.log("POST: cont/imageInsertion");
-    console.log("image_urlllllll", req.file);
     assert(req.file, Definer.generel_err3);
     const image_url = req.file.path;
 
